@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  scaffold:
+    name: Scaffold verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify required directories
+        run: |
+          test -d backend
+          test -d frontend
+          test -d docs
+          test -d infrastructure
+          test -d .github/workflows
+
+      - name: Verify required documentation
+        run: |
+          test -f README.md
+          test -f LICENSE
+          test -f docs/architecture.md
+          test -f docs/roadmap.md
+          test -f infrastructure/docker-compose.yml
