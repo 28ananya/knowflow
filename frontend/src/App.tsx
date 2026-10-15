@@ -1,36 +1,41 @@
-function App() {
-  return (
-    <main className="app-shell">
-      <section className="hero">
-        <span className="badge">KnowFlow</span>
-        <h1>Enterprise knowledge, powered by AI.</h1>
-        <p>
-          A secure workspace for internal documents, instant answers, and trusted
-          knowledge retrieval.
-        </p>
-        <div className="actions">
-          <button type="button">Upload documents</button>
-          <button type="button" className="secondary">
-            Open workspace
-          </button>
-        </div>
-      </section>
+import { Navigate, Route, Routes } from 'react-router-dom'
 
-      <section className="grid">
-        <article>
-          <h2>Secure knowledge base</h2>
-          <p>Organize internal documents and business context in one place.</p>
-        </article>
-        <article>
-          <h2>AI-powered answers</h2>
-          <p>Ground responses in trusted sources and citations.</p>
-        </article>
-        <article>
-          <h2>Operational visibility</h2>
-          <p>Track usage, confidence, and knowledge quality across the system.</p>
-        </article>
-      </section>
-    </main>
+import DashboardPage from './routes/DashboardPage'
+import LoginPage from './routes/LoginPage'
+
+const AUTH_TOKEN_KEY = 'knowflow-token'
+const AUTH_EMAIL_KEY = 'knowflow-email'
+
+function App() {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY)
+  const email = localStorage.getItem(AUTH_EMAIL_KEY) ?? 'user'
+
+  const handleAuthenticate = (nextToken: string, nextEmail: string) => {
+    localStorage.setItem(AUTH_TOKEN_KEY, nextToken)
+    localStorage.setItem(AUTH_EMAIL_KEY, nextEmail)
+    window.location.assign('/dashboard')
+  }
+
+  const handleSignOut = () => {
+    localStorage.removeItem(AUTH_TOKEN_KEY)
+    localStorage.removeItem(AUTH_EMAIL_KEY)
+    window.location.assign('/login')
+  }
+
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate to={token ? '/dashboard' : '/login'} replace />} />
+      <Route
+        path="/login"
+        element={token ? <Navigate to="/dashboard" replace /> : <LoginPage onAuthenticate={handleAuthenticate} />}
+      />
+      <Route
+        path="/dashboard"
+        element={
+          token ? <DashboardPage email={email} onSignOut={handleSignOut} /> : <Navigate to="/login" replace />
+        }
+      />
+    </Routes>
   )
 }
 
